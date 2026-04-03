@@ -131,6 +131,14 @@ eventBtns.forEach(btn => {
                 "usb_out": `"Bye bye!"`,
                 "lid_close": `"Sweet dreams!"`
             },
+            "en_spicy": {
+                "slap": `*loud moan* "Don't stop!"`,
+                "charger_in": `"Ohhh, that's the spot~"`,
+                "charger_out": `"I was SO close!"`,
+                "usb_in": `"Going in~"`,
+                "usb_out": `"That was... quick."`,
+                "lid_close": `"Was it good for you?~"`
+            },
             "ja_spicy": {
                 "slap": `"やめてください！"`,
                 "charger_in": `"あぁっ、電気が流れてる〜"`,
