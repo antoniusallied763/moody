@@ -8,22 +8,23 @@ import (
 	"github.com/dinakars777/moody/mood"
 )
 
-// macOS voice mapping per mood — each mood gets a distinct system voice
+// macOS voice mapping per mood — default to female (Samantha) for all moods 
+// to maintain a consistent female personality across the app
 var moodVoices = map[mood.MoodLabel]string{
-	mood.MoodHappy:      "Samantha",   // Cheerful female
-	mood.MoodGrumpy:     "Alex",       // Deep male
-	mood.MoodAnxious:    "Samantha",   // Same voice, faster rate
-	mood.MoodDramatic:   "Daniel",     // British accent for theatrical flair
-	mood.MoodDeadInside: "Fred",       // Robotic monotone
+	mood.MoodHappy:      "Samantha",
+	mood.MoodGrumpy:     "Samantha",
+	mood.MoodAnxious:    "Samantha",
+	mood.MoodDramatic:   "Samantha",
+	mood.MoodDeadInside: "Samantha",
 }
 
 // Speech rate per mood
 var moodRates = map[mood.MoodLabel]int{
 	mood.MoodHappy:      200, // Normal-ish
-	mood.MoodGrumpy:     170, // Slower, more deliberate
+	mood.MoodGrumpy:     140, // Slower, more deliberate and annoyed
 	mood.MoodAnxious:    260, // Fast, panicky
 	mood.MoodDramatic:   150, // Slow for dramatic effect
-	mood.MoodDeadInside: 140, // Slow, lifeless
+	mood.MoodDeadInside: 120, // Very slow, lifeless
 }
 
 // Player handles text-to-speech audio playback using macOS `say`
