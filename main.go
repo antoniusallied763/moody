@@ -227,6 +227,7 @@ func processEvent(engine *mood.Engine, voiceMgr *voice.Manager, player *voice.Pl
 	// Get voice line
 	eventName := mood.EventName(evt.Type)
 	line := voiceMgr.GetLine(eventName, moodLabel)
+	audioPath := voiceMgr.GetAudioPath(eventName)
 
 	if verbose {
 		log.Printf("[event] %s | mood: %s | response: %s",
@@ -241,9 +242,13 @@ func processEvent(engine *mood.Engine, voiceMgr *voice.Manager, player *voice.Pl
 		fmt.Printf("%s %s%s: %s%s\n", m.Emoji(), color,
 			strings.ToUpper(string(moodLabel)), line, "\033[0m")
 
-		// Speak it out loud via TTS
+		// Play it via MP3 or TTS
 		if player != nil {
-			player.Speak(line, moodLabel)
+			if audioPath != "" {
+				player.PlayFile(audioPath)
+			} else {
+				player.Speak(line, moodLabel)
+			}
 		}
 	}
 

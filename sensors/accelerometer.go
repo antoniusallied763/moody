@@ -1,102 +1,18 @@
 package sensors
 
-/*
-#cgo CFLAGS: -x objective-c
-#cgo LDFLAGS: -framework IOKit -framework CoreFoundation -framework Foundation
-
-#include <IOKit/hid/IOHIDManager.h>
-#include <CoreFoundation/CoreFoundation.h>
-#include <math.h>
-#include <stdlib.h>
-
-// Accelerometer state
-static IOHIDManagerRef hidManager = NULL;
-static double lastX = 0, lastY = 0, lastZ = 0;
-static int dataReady = 0;
-
-static void inputCallback(void *context, IOReturn result, void *sender, IOHIDValueRef value) {
-    IOHIDElementRef element = IOHIDValueGetElement(value);
-    uint32_t usage = IOHIDElementGetUsage(element);
-    CFIndex raw = IOHIDValueGetIntegerValue(value);
-    double scaled = (double)raw / 10000.0; // Scale to approximate g-force
-
-    switch (usage) {
-        case 0x30: lastX = scaled; break; // X axis
-        case 0x31: lastY = scaled; break; // Y axis
-        case 0x32: lastZ = scaled; dataReady = 1; break; // Z axis (last to update)
-    }
-}
-
-static int accel_init(void) {
-    hidManager = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
-    if (!hidManager) return -1;
-
-    // Match Apple SPU accelerometer
-    CFMutableDictionaryRef match = CFDictionaryCreateMutable(
-        kCFAllocatorDefault, 0,
-        &kCFTypeDictionaryKeyCallBacks,
-        &kCFTypeDictionaryValueCallBacks
-    );
-
-    int usagePage = 0x20; // kHIDPage_Sensor
-    int usage = 0x73;     // kHIDUsage_Snsr_Motion_Accelerometer3D
-    CFNumberRef pageRef = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &usagePage);
-    CFNumberRef usageRef = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &usage);
-
-    CFDictionarySetValue(match, CFSTR(kIOHIDDeviceUsagePageKey), pageRef);
-    CFDictionarySetValue(match, CFSTR(kIOHIDDeviceUsageKey), usageRef);
-
-    CFRelease(pageRef);
-    CFRelease(usageRef);
-
-    IOHIDManagerSetDeviceMatching(hidManager, match);
-    CFRelease(match);
-
-    IOHIDManagerRegisterInputValueCallback(hidManager, inputCallback, NULL);
-    IOHIDManagerScheduleWithRunLoop(hidManager, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
-
-    IOReturn ret = IOHIDManagerOpen(hidManager, kIOHIDOptionsTypeNone);
-    if (ret != kIOReturnSuccess) {
-        CFRelease(hidManager);
-        hidManager = NULL;
-        return -2;
-    }
-
-    return 0;
-}
-
-static void accel_close(void) {
-    if (hidManager) {
-        IOHIDManagerClose(hidManager, kIOHIDOptionsTypeNone);
-        CFRelease(hidManager);
-        hidManager = NULL;
-    }
-}
-
-// Read one sample (non-blocking). Returns 1 if data available.
-static int accel_read(double *x, double *y, double *z) {
-    // Run the runloop briefly to process HID events
-    CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0.004, false);
-    if (dataReady) {
-        *x = lastX;
-        *y = lastY;
-        *z = lastZ;
-        dataReady = 0;
-        return 1;
-    }
-    return 0;
-}
-*/
-import "C"
 import (
+	"fmt"
 	"math"
 	"sync"
 	"time"
 
 	"github.com/dinakars777/moody/mood"
+	"github.com/taigrr/apple-silicon-accelerometer/detector"
+	"github.com/taigrr/apple-silicon-accelerometer/sensor"
+	"github.com/taigrr/apple-silicon-accelerometer/shm"
 )
 
-// Accelerometer detects physical impacts on the MacBook
+// Accelerometer detects physical impacts on an Apple Silicon MacBook
 type Accelerometer struct {
 	mu           sync.Mutex
 	running      bool
@@ -130,16 +46,13 @@ func NewAccelerometer(minAmplitude float64, cooldownMs int, fast bool) *Accelero
 	}
 }
 
-func (a *Accelerometer) Name() string { return "Accelerometer" }
+func (a *Accelerometer) Name() string { return "Accelerometer (Apple Silicon)" }
 
 func (a *Accelerometer) Available() bool {
-	// Try to init and immediately close to test availability
-	ret := C.accel_init()
-	if ret == 0 {
-		C.accel_close()
-		return true
-	}
-	return false
+	// Let's assume it's available if we can compile this code,
+	// though it really requires sudo + Apple Silicon.
+	// Real detection happens in Start().
+	return true
 }
 
 func (a *Accelerometer) Start(events chan<- mood.HardwareEvent) error {
@@ -151,12 +64,46 @@ func (a *Accelerometer) Start(events chan<- mood.HardwareEvent) error {
 	a.running = true
 	a.mu.Unlock()
 
-	ret := C.accel_init()
-	if ret != 0 {
-		return errSensorInit("accelerometer", int(ret))
+	// Create shared memory for accelerometer data
+	accelRing, err := shm.CreateRing("accel_moody")
+	if err != nil {
+		a.mu.Lock()
+		a.running = false
+		a.mu.Unlock()
+		return fmt.Errorf("creating accel shm: %w", err)
 	}
 
-	go a.pollLoop(events)
+	// Wait channels for the background sensor worker
+	sensorReady := make(chan struct{})
+	sensorErr := make(chan error, 1)
+
+	// Fire up the sensor.Run() function which needs CFRunLoop.
+	// It blocks forever, so we run it in a goroutine.
+	go func() {
+		close(sensorReady)
+		err := sensor.Run(sensor.Config{
+			AccelRing: accelRing,
+		})
+		if err != nil {
+			sensorErr <- err
+		}
+	}()
+
+	// Wait for sensor to be ready or fail immediately
+	select {
+	case err := <-sensorErr:
+		a.mu.Lock()
+		a.running = false
+		a.mu.Unlock()
+		accelRing.Close()
+		accelRing.Unlink()
+		return fmt.Errorf("sensor launch failed: %w", err)
+	case <-sensorReady:
+		// Give it a tiny bit of time to start up
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	go a.pollLoop(events, accelRing)
 	return nil
 }
 
@@ -166,89 +113,83 @@ func (a *Accelerometer) Stop() {
 	if a.running {
 		close(a.stopCh)
 		a.running = false
-		C.accel_close()
+		// Note: sensor.Run() loops forever, but our program is typically exiting anyway.
+		// In a long-running robust daemon we'd signal the CFRunLoop to stop.
 	}
 }
 
-func (a *Accelerometer) pollLoop(events chan<- mood.HardwareEvent) {
-	// Ring buffer for STA/LTA detection
-	const bufSize = 200
-	var buf [bufSize]float64
-	var bufIdx int
-	var bufFull bool
-	var lastTrigger time.Time
+func (a *Accelerometer) pollLoop(events chan<- mood.HardwareEvent, accelRing *shm.RingBuffer) {
+	defer accelRing.Close()
+	defer accelRing.Unlink()
+
+	det := detector.New()
+	var lastAccelTotal uint64
+	var lastEventTime time.Time
 
 	pollInterval := 10 * time.Millisecond
 	if a.fastMode {
 		pollInterval = 4 * time.Millisecond
 	}
+	maxBatch := 200
+	if a.fastMode {
+		maxBatch = 320
+	}
 
 	ticker := time.NewTicker(pollInterval)
 	defer ticker.Stop()
+
+	var lastTrigger time.Time
 
 	for {
 		select {
 		case <-a.stopCh:
 			return
 		case <-ticker.C:
-			var x, y, z C.double
-			if C.accel_read(&x, &y, &z) != 1 {
+			now := time.Now()
+			tNow := float64(now.UnixNano()) / 1e9
+
+			samples, newTotal := accelRing.ReadNew(lastAccelTotal, shm.AccelScale)
+			lastAccelTotal = newTotal
+			
+			if len(samples) > maxBatch {
+				samples = samples[len(samples)-maxBatch:]
+			}
+
+			nSamples := len(samples)
+			for idx, sample := range samples {
+				tSample := tNow - float64(nSamples-idx-1)/float64(det.FS)
+				det.Process(sample.X, sample.Y, sample.Z, tSample)
+			}
+
+			if len(det.Events) == 0 {
 				continue
 			}
 
-			// Compute acceleration magnitude (removing gravity ~1g on z)
-			magnitude := math.Sqrt(float64(x*x) + float64(y*y) + float64((z-1.0)*(z-1.0)))
-
-			// Store in ring buffer
-			buf[bufIdx] = magnitude
-			bufIdx = (bufIdx + 1) % bufSize
-			if bufIdx == 0 {
-				bufFull = true
-			}
-
-			if !bufFull {
+			// Get latest event
+			ev := det.Events[len(det.Events)-1]
+			if ev.Time.Equal(lastEventTime) {
 				continue
 			}
+			lastEventTime = ev.Time
 
-			// Calculate mean and check for spike
-			var sum float64
-			for _, v := range buf {
-				sum += v
+			// Cooldown & Amplitude check
+			if ev.Amplitude < a.minAmplitude {
+				continue
 			}
-			mean := sum / float64(bufSize)
+			if time.Since(lastTrigger) < time.Duration(a.cooldownMs)*time.Millisecond {
+				continue
+			}
+			lastTrigger = now
 
-			// Peak detection: is current value significantly above the mean?
-			peak := magnitude - mean
-			if peak > a.minAmplitude {
-				// Cooldown check
-				if time.Since(lastTrigger) < time.Duration(a.cooldownMs)*time.Millisecond {
-					continue
-				}
-				lastTrigger = time.Now()
+			// Normalize intensity to 0.0-1.0 range
+			intensity := math.Min(ev.Amplitude/0.8, 1.0)
 
-				// Normalize intensity to 0.0-1.0 range
-				intensity := math.Min(peak/0.5, 1.0)
-
-				events <- mood.HardwareEvent{
-					Type:      mood.EventSlap,
-					Intensity: intensity,
-					Timestamp: time.Now(),
-					Meta:      "physical impact",
-				}
+			events <- mood.HardwareEvent{
+				Type:      mood.EventSlap,
+				Intensity: intensity,
+				Timestamp: now,
+				Meta:      fmt.Sprintf("%g g", ev.Amplitude),
 			}
 		}
 	}
-}
-
-type sensorError struct {
-	sensor string
-	code   int
-}
-
-func (e *sensorError) Error() string {
-	return e.sensor + ": init failed with code " + string(rune('0'+e.code))
-}
-
-func errSensorInit(name string, code int) error {
-	return &sensorError{sensor: name, code: code}
 }

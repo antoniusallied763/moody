@@ -43,6 +43,9 @@ func NewManager() *Manager {
 		packsDir: packsDir,
 	}
 
+	// Extract bundled mp3s if missing
+	ExtractAssets(packsDir)
+
 	// Load the built-in default pack
 	m.loadBuiltinDefault()
 
@@ -91,6 +94,31 @@ func (m *Manager) GetLine(eventName string, moodLabel mood.MoodLabel) string {
 	}
 
 	return lines[rand.Intn(len(lines))]
+}
+
+// GetAudioPath checks if there are pre-recorded audio files for the event
+// Returns the absolute path to a random .mp3 or .wav in the event's audio directory.
+func (m *Manager) GetAudioPath(eventName string) string {
+	audioDir := filepath.Join(m.packsDir, m.activePack, "audio", eventName)
+	entries, err := os.ReadDir(audioDir)
+	if err != nil {
+		return ""
+	}
+
+	var valid []string
+	for _, e := range entries {
+		if !e.IsDir() {
+			lower := strings.ToLower(e.Name())
+			if strings.HasSuffix(lower, ".mp3") || strings.HasSuffix(lower, ".wav") {
+				valid = append(valid, filepath.Join(audioDir, e.Name()))
+			}
+		}
+	}
+
+	if len(valid) > 0 {
+		return valid[rand.Intn(len(valid))]
+	}
+	return ""
 }
 
 // ListPacks returns names of all loaded packs

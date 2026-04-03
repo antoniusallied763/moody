@@ -100,9 +100,36 @@ func (p *Player) SpeakSync(text string, moodLabel mood.MoodLabel) {
 	cmd.Run()
 }
 
+// PlayFile plays an audio file using macOS `afplay`
+func (p *Player) PlayFile(path string) {
+	if !p.enabled || path == "" {
+		return
+	}
+
+	p.mu.Lock()
+	if p.speaking {
+		p.mu.Unlock()
+		return // Don't overlap speech
+	}
+	p.speaking = true
+	p.mu.Unlock()
+
+	go func() {
+		defer func() {
+			p.mu.Lock()
+			p.speaking = false
+			p.mu.Unlock()
+		}()
+
+		cmd := exec.Command("afplay", path)
+		cmd.Run()
+	}()
+}
+
 // Stop interrupts any current speech
 func (p *Player) Stop() {
 	exec.Command("killall", "say").Run()
+	exec.Command("killall", "afplay").Run()
 	p.mu.Lock()
 	p.speaking = false
 	p.mu.Unlock()
