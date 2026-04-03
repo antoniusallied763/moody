@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>moody — Your MacBook has feelings.</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-effect"></div>
+    
+    <main class="container">
+        <header>
+            <h1>moody <span>🫠</span></h1>
+            <p>Every hardware event triggers a personality response. Your laptop is now sentient.</p>
+        </header>
+
+        <div class="demo-wrapper">
+            <!-- Left: Terminal TUI Screen -->
+            <div class="terminal glass">
+                <div class="terminal-header">
+                    <span class="mac-btn red"></span>
+                    <span class="mac-btn yellow"></span>
+                    <span class="mac-btn green"></span>
+                    <div class="terminal-title">sudo moody --dashboard</div>
+                </div>
+                <div class="terminal-body" id="tui-container">
+                    <pre id="tui-face">
+    ^____^
+   ( o  o )
+     ---|  
+                    </pre>
+                    <div class="tui-mood-label" id="tui-mood-label">NEUTRAL</div>
+
+                    <div class="bars">
+                        <div class="bar-row">
+                            <span class="bar-label">Happiness</span>
+                            <div class="progress-bar"><div class="fill" id="bar-happy" style="width: 50%; background: #4ADE80;"></div></div>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">Energy</span>
+                            <div class="progress-bar"><div class="fill" id="bar-energy" style="width: 60%; background: #60A5FA;"></div></div>
+                        </div>
+                        <div class="bar-row">
+                            <span class="bar-label">Trust</span>
+                            <div class="progress-bar"><div class="fill" id="bar-trust" style="width: 50%; background: #A78BFA;"></div></div>
+                        </div>
+                    </div>
+
+                    <div class="tui-logs">
+                        <div class="log-line">Last event: <span class="highlight" id="log-event">Started moody daemon</span></div>
+                        <div class="log-line">Response: <span class="response" id="log-response">"I am ready."</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Controls -->
+            <div class="controls glass">
+                <h3>Select Personality</h3>
+                <div class="pack-selector">
+                    <button class="pack-btn active" data-pack="en_default">SFW (Coworker)</button>
+                    <button class="pack-btn" data-pack="ja_spicy">Anime (ja_spicy)</button>
+                    <button class="pack-btn" data-pack="en_gordon">Gordon Ramsay</button>
+                </div>
+
+                <h3>Trigger Hardware Event</h3>
+                <div class="event-grid">
+                    <button class="event-btn" data-event="usb_in">🔌 Plug USB In</button>
+                    <button class="event-btn" data-event="usb_out">❌ Pull USB Out</button>
+                    <button class="event-btn" data-event="charger_in">⚡ Connect Charger</button>
+                    <button class="event-btn" data-event="charger_out">🔌 Remove Charger</button>
+                    <button class="event-btn" data-event="slap">👋 Slap Laptop</button>
+                    <button class="event-btn" data-event="lid_close">💻 Close Lid</button>
+                </div>
+                
+                <div class="instruction">
+                    Click buttons to trigger dynamic hardware reactions.
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <a href="https://github.com/dinakars777/moody" target="_blank" class="github-link">
+                View on GitHub
+            </a>
+            <p>Built with Go • Fully native Apple Silicon integration</p>
+        </footer>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
