@@ -112,7 +112,7 @@ func (m *Manager) GetAudioPath(eventName string) string {
 	for _, e := range entries {
 		if !e.IsDir() {
 			lower := strings.ToLower(e.Name())
-			if strings.HasSuffix(lower, ".mp3") || strings.HasSuffix(lower, ".wav") {
+			if strings.HasSuffix(lower, ".mp3") || strings.HasSuffix(lower, ".wav") || strings.HasSuffix(lower, ".mp4") || strings.HasSuffix(lower, ".m4a") || strings.HasSuffix(lower, ".aiff") {
 				valid = append(valid, filepath.Join(audioDir, e.Name()))
 			}
 		}
