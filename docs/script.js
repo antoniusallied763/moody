@@ -46,6 +46,11 @@ let state = {
 
 // Simple audio playback wrapper
 function playAudio(pack, eventName) {
+    // Skip audio for text-only packs (Hindi)
+    if (pack.startsWith("hi_")) {
+        return; // Hindi packs use TTS, not audio files
+    }
+    
     if (currentAudio) {
         currentAudio.pause();
         currentAudio.currentTime = 0;
