@@ -32,11 +32,19 @@ type Player struct {
 	mu       sync.Mutex
 	speaking bool
 	enabled  bool
+	language string // Language code for voice selection
 }
 
 // NewPlayer creates an audio player
 func NewPlayer(enabled bool) *Player {
-	return &Player{enabled: enabled}
+	return &Player{enabled: enabled, language: "en"}
+}
+
+// SetLanguage sets the language for voice selection
+func (p *Player) SetLanguage(lang string) {
+	p.mu.Lock()
+	p.language = lang
+	p.mu.Unlock()
 }
 
 // Speak plays a voice line using macOS TTS with mood-appropriate voice
@@ -60,10 +68,8 @@ func (p *Player) Speak(text string, moodLabel mood.MoodLabel) {
 			p.mu.Unlock()
 		}()
 
-		voice := moodVoices[moodLabel]
-		if voice == "" {
-			voice = "Samantha"
-		}
+		// Select voice based on language
+		voice := p.getVoiceForLanguage(moodLabel)
 		rate := moodRates[moodLabel]
 		if rate == 0 {
 			rate = 200
@@ -84,10 +90,7 @@ func (p *Player) SpeakSync(text string, moodLabel mood.MoodLabel) {
 		return
 	}
 
-	voice := moodVoices[moodLabel]
-	if voice == "" {
-		voice = "Samantha"
-	}
+	voice := p.getVoiceForLanguage(moodLabel)
 	rate := moodRates[moodLabel]
 	if rate == 0 {
 		rate = 200
@@ -99,6 +102,29 @@ func (p *Player) SpeakSync(text string, moodLabel mood.MoodLabel) {
 		text,
 	)
 	cmd.Run()
+}
+
+// getVoiceForLanguage returns the appropriate voice based on language
+func (p *Player) getVoiceForLanguage(moodLabel mood.MoodLabel) string {
+	p.mu.Lock()
+	lang := p.language
+	p.mu.Unlock()
+
+	// Language-specific voices
+	switch lang {
+	case "hi": // Hindi
+		return "Lekha"
+	case "ja": // Japanese
+		return "Kyoko"
+	case "en": // English
+		fallthrough
+	default:
+		voice := moodVoices[moodLabel]
+		if voice == "" {
+			voice = "Samantha"
+		}
+		return voice
+	}
 }
 
 // PlayFile plays an audio file using macOS `afplay`

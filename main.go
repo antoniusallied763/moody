@@ -186,6 +186,11 @@ Examples:
 	player := voice.NewPlayer(!*mute && !*silent)
 	defer player.Stop()
 
+	// Set the language for TTS voice selection
+	if packInfo != nil {
+		player.SetLanguage(packInfo.Language)
+	}
+
 	// Event channel
 	events := make(chan mood.HardwareEvent, 32)
 
@@ -265,8 +270,8 @@ func processEvent(engine *mood.Engine, voiceMgr *voice.Manager, player *voice.Pl
 	audioPath := voiceMgr.GetAudioPath(eventName)
 
 	if verbose {
-		log.Printf("[event] %s | mood: %s | response: %s",
-			mood.EventLabel(evt.Type), moodLabel, line)
+		log.Printf("[event] %s | mood: %s | eventName: %s | activePack: %s | response: %s",
+			mood.EventLabel(evt.Type), moodLabel, eventName, voiceMgr.ActivePack(), line)
 	}
 
 	// Display/play response

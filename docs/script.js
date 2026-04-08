@@ -152,6 +152,22 @@ eventBtns.forEach(btn => {
                 "usb_out": `"えっ、もう抜いちゃうの？"`,
                 "lid_close": `"よかった？〜"`
             },
+            "hi_default": {
+                "slap": `"अरे! यह क्या था?"`,
+                "charger_in": `"म्म्म, यह अच्छा है।"`,
+                "charger_out": `"रुको, मैं अभी खत्म नहीं हुआ!"`,
+                "usb_in": `"ओह, नया दोस्त!"`,
+                "usb_out": `"बाय बाय!"`,
+                "lid_close": `"मीठे सपने!"`
+            },
+            "hi_spicy": {
+                "slap": `"म्म्म!" "फिर से करो~"`,
+                "charger_in": `"ओह्ह, वही जगह~"`,
+                "charger_out": `"मैं बहुत करीब थी!"`,
+                "usb_in": `"म्म्म... और अंदर डालो..."`,
+                "usb_out": `"वह था... जल्दी।"`,
+                "lid_close": `"क्या तुम्हारे लिए अच्छा था?~"`
+            },
             "en_gordon": {
                 "slap": `"You absolute donkey! What are you doing!?"`,
                 "charger_in": `"Yes, chef! Thank god for that!"`,
